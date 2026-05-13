@@ -85,7 +85,7 @@ module.exports = async function handler(req, res) {
 
     const endpoint = (process.env.SPEECHACE_ENDPOINT || 'https://api.speechace.co').replace(/\/$/, '');
     const dialect = process.env.SPEECHACE_DIALECT || 'en-us';
-    const url = `${endpoint}/api/scoring/text/v9/json?key=${encodeURIComponent(apiKey)}&dialect=${encodeURIComponent(dialect)}`;
+    const url = `https://api.speechace.com/api/scoring/text/v9/json?key=${encodeURIComponent(apiKey)}&dialect=en-us`;
 
     const speechRes = await fetch(url, { method: 'POST', body: form });
     const rawText = await speechRes.text();
