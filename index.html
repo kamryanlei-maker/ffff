@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pronunciation AI Practice</title>
+  <style>
+    *{box-sizing:border-box} body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#f7f9fc;color:#0f172a} header{background:white;border-bottom:1px solid #d9e2ef;padding:28px 36px;display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap} .sub{color:#64748b;font-size:16px;margin-bottom:6px}.title{font-size:40px;font-weight:800}.wrap{max-width:1200px;margin:0 auto;padding:32px;display:grid;grid-template-columns:1.4fr 1fr;gap:24px}.card{background:white;border:1px solid #d9e2ef;border-radius:24px;padding:28px;box-shadow:0 8px 20px rgba(15,23,42,.06);margin-bottom:24px}h2{font-size:30px;margin:0 0 14px}label{display:block;font-weight:700;color:#475569;margin:16px 0 8px}input,select{width:100%;border:1px solid #cbd5e1;border-radius:16px;padding:16px;font-size:18px;background:white}.row{display:grid;grid-template-columns:1fr 1fr;gap:18px}.passage{background:#f1f5f9;border:1px solid #dbe3ee;border-radius:18px;padding:22px;font-size:20px;line-height:1.8;white-space:pre-wrap}button{border:0;border-radius:16px;padding:16px 22px;font-size:18px;font-weight:700;cursor:pointer;margin:8px 8px 8px 0}.primary{background:#0f172a;color:white}.secondary{background:#e2e8f0}.danger{background:#dc2626;color:white}.disabled{opacity:.55;cursor:not-allowed}.feedback{font-size:18px;line-height:1.6}.error{background:#fff1f2;border:1px solid #fecdd3;color:#991b1b;border-radius:18px;padding:18px;font-weight:700}.ok{background:#ecfdf5;border:1px solid #bbf7d0;color:#166534;border-radius:18px;padding:18px}.score{margin:16px 0}.bar{height:12px;background:#e2e8f0;border-radius:99px;overflow:hidden}.fill{height:100%;background:#0f172a}.tag{display:inline-block;background:#e2e8f0;border-radius:99px;padding:8px 12px;margin:4px}.highlight{font-weight:800;color:#dc2626;background:#fee2e2;border-radius:6px;padding:1px 4px}.muted{color:#64748b}.hidden{display:none}@media(max-width:900px){.wrap{grid-template-columns:1fr;padding:18px}.title{font-size:32px}.row{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+<header>
+  <div><div class="sub">English Reading Practice</div><div class="title">Pronunciation AI Practice</div></div>
+  <div><button class="primary" onclick="showStudent()">Student View</button><button class="secondary" onclick="showTeacher()">Teacher Dashboard</button></div>
+</header>
+
+<main class="wrap" id="studentView">
+  <section>
+    <div class="card"><h2>Student Information</h2><p class="muted">Enter your name before recording.</p><div class="row"><div><label>Student Name</label><input id="studentName" placeholder="e.g. Chan Tai Man"></div><div><label>Class</label><select id="studentClass"><option>Form 2B</option><option>Form 3A</option><option>Form 4A</option><option>Form 4B</option><option>Form 5A</option></select></div></div></div>
+    <div class="card"><h2>Reading Passage</h2><p class="muted">Choose a passage and read it clearly.</p><label>Passage</label><select id="passageSelect" onchange="renderPassage()"></select><div class="passage" id="passageText"></div></div>
+    <div class="card"><h2>Record Your Reading</h2><p class="muted">Press record, read the passage, then submit your recording.</p><button class="primary" id="startBtn" onclick="startRecording()">Start Recording</button><button class="danger hidden" id="stopBtn" onclick="stopRecording()">Stop Recording</button><button class="secondary" id="submitBtn" onclick="submitRecording()" disabled>Submit Recording</button><div id="recordingStatus" class="muted"></div><div id="audioBox"></div></div>
+  </section>
+  <aside>
+    <div class="card"><h2>Speechace Feedback</h2><p class="muted">Real AI analysis appears here after submission.</p><div id="feedback" class="feedback muted">Your feedback will appear here.</div></div>
+  </aside>
+</main>
+
+<main class="wrap hidden" id="teacherView"><section class="card" style="grid-column:1 / -1"><h2>Teacher Dashboard</h2><p class="muted">Records are stored in this browser only. Export CSV after class.</p><button class="primary" onclick="exportCSV()">Export CSV</button><div id="records"></div></section></main>
+
+<script>
+const passages=[{id:'p1',title:'Passage One: Making Scones',text:`Miss: Now, everyone, listen carefully. Tomorrow we are going to cook something together.
+Student: Oh, good! What do we need to bring?
+Miss: Please bring a big bowl.
+Student: OK.
+Miss: I also want you to bring some other things from home. Please write them down on a piece of paper now.
+Student: Do we need to bring flour, Miss?
+Miss: No, you don’t. We already have some. But I want you to bring sugar, butter, and eggs.
+Student: OK, Miss. What are we going to cook?
+Miss: They are called scones. They are a kind of cake.
+Student: Do you spell that S-C-O-N-E-S?
+Miss: Yes, that’s right.
+Student: How many scones are we going to make?
+Miss: There will be enough to make 48, so everyone can take some home.
+Student: How long does it take to cook them? An hour?
+Miss: It only takes ten minutes.
+Student: Are they nice, Miss?
+Miss: Oh yes! They are lovely when they are warm. You can eat them with jam.`},{id:'p2',title:'Passage Two: A Film Review',text:`I loved the first Avatar movie, so I was excited to see its sequel, Avatar: The Way of Water. The story follows two main characters, who now have four kids, as they leave their jungle home to live in the ocean. I think the movie is amazing, charming and breathtaking. The actors dove underwater for real without fake effects, which makes the movie very realistic. Moreover, the love between the family members is really moving. Although the movie is long, it is not dull at all and I love it!`},{id:'p3',title:'Passage Three: Film Language',text:`The animation in this film is beautiful, with attention to detail in the character design.
+Each member of the cast gives a fantastic performance.
+I am touched by the struggle of the main character to overcome his disability.
+This documentary about the oceans is acclaimed for its beautiful cinematography.
+The costume design in this film is very futuristic.
+The editing of a film can make it more intense and exciting.
+The lighting in a film helps to create its mood.
+The plot of the film is intriguing because it keeps the audience guessing what will happen next.`}];
+let recorder,chunks=[],audioBlob=null; let records=JSON.parse(localStorage.getItem('records')||'[]');
+function init(){const s=document.getElementById('passageSelect'); passages.forEach(p=>{const o=document.createElement('option');o.value=p.id;o.textContent=p.title;s.appendChild(o)}); renderPassage(); renderRecords();}
+function currentPassage(){return passages.find(p=>p.id===document.getElementById('passageSelect').value)||passages[0]}
+function renderPassage(){document.getElementById('passageText').textContent=currentPassage().text; document.getElementById('feedback').innerHTML='<span class="muted">Your feedback will appear here.</span>'}
+async function startRecording(){chunks=[];audioBlob=null;document.getElementById('audioBox').innerHTML='';document.getElementById('submitBtn').disabled=true;const stream=await navigator.mediaDevices.getUserMedia({audio:true});recorder=new MediaRecorder(stream);recorder.ondataavailable=e=>{if(e.data.size>0)chunks.push(e.data)};recorder.onstop=()=>{audioBlob=new Blob(chunks,{type:'audio/webm'});stream.getTracks().forEach(t=>t.stop());document.getElementById('audioBox').innerHTML='<p><b>Your recording:</b></p><audio controls src="'+URL.createObjectURL(audioBlob)+'"></audio>';document.getElementById('submitBtn').disabled=false;};recorder.start();document.getElementById('startBtn').classList.add('hidden');document.getElementById('stopBtn').classList.remove('hidden');document.getElementById('recordingStatus').textContent='Recording now...';}
+function stopRecording(){recorder.stop();document.getElementById('startBtn').classList.remove('hidden');document.getElementById('stopBtn').classList.add('hidden');document.getElementById('recordingStatus').textContent='Recording stopped.';}
+function blobToBase64(blob){return new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(String(r.result).split(',')[1]);r.onerror=reject;r.readAsDataURL(blob);});}
+async function submitRecording(){if(!audioBlob)return;const fb=document.getElementById('feedback');fb.innerHTML='<div class="ok">Analysing with Speechace...</div>';try{const audioBase64=await blobToBase64(audioBlob);const p=currentPassage();const response=await fetch('/api/analyze-pronunciation',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({audioBase64,contentType:audioBlob.type,filename:'student-reading.webm',passage:p.text,passageTitle:p.title,studentName:document.getElementById('studentName').value||'Student',studentClass:document.getElementById('studentClass').value})});const data=await response.json();if(!response.ok)throw new Error(data.message||data.error||'Analysis failed');showFeedback(data);saveRecord(data);}catch(err){fb.innerHTML='<div class="error">'+escapeHtml(err.message)+'</div>';}}
+function showFeedback(data){const words=(data.difficultWords||[]).map(w=>'<span class="tag">'+escapeHtml(w)+'</span>').join('');let html='';['pronunciation','fluency','overall'].forEach(k=>{const v=Math.round(Number(data[k]||0));html+='<div class="score"><b>'+k.toUpperCase()+': '+v+'/100</b><div class="bar"><div class="fill" style="width:'+Math.max(0,Math.min(100,v))+'%"></div></div></div>'});html+='<h3>Words to Practise</h3><div>'+(words||'<span class="muted">No low-score words found.</span>')+'</div><h3>Highlighted Feedback</h3><div class="passage">'+(data.highlightedText||escapeHtml(currentPassage().text))+'</div><h3>Teacher-style Feedback</h3><p>'+(data.feedback||'Good effort. Keep practising for clearer pronunciation and smoother fluency.')+'</p>';document.getElementById('feedback').innerHTML=html;}
+function saveRecord(data){const r={time:new Date().toLocaleString(),name:document.getElementById('studentName').value||'Student',className:document.getElementById('studentClass').value,passage:currentPassage().title,pronunciation:data.pronunciation||0,fluency:data.fluency||0,overall:data.overall||0};records.unshift(r);localStorage.setItem('records',JSON.stringify(records));renderRecords();}
+function renderRecords(){document.getElementById('records').innerHTML='<table border="1" cellpadding="10" style="border-collapse:collapse;width:100%;background:white"><tr><th>Name</th><th>Class</th><th>Passage</th><th>Pronunciation</th><th>Fluency</th><th>Overall</th><th>Time</th></tr>'+records.map(r=>`<tr><td>${escapeHtml(r.name)}</td><td>${escapeHtml(r.className)}</td><td>${escapeHtml(r.passage)}</td><td>${r.pronunciation}</td><td>${r.fluency}</td><td>${r.overall}</td><td>${escapeHtml(r.time)}</td></tr>`).join('')+'</table>';}
+function exportCSV(){const rows=[['Name','Class','Passage','Pronunciation','Fluency','Overall','Time'],...records.map(r=>[r.name,r.className,r.passage,r.pronunciation,r.fluency,r.overall,r.time])];const csv=rows.map(row=>row.map(c=>'"'+String(c).replaceAll('"','""')+'"').join(',')).join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='pronunciation-results.csv';a.click();}
+function showStudent(){document.getElementById('studentView').classList.remove('hidden');document.getElementById('teacherView').classList.add('hidden')}function showTeacher(){document.getElementById('studentView').classList.add('hidden');document.getElementById('teacherView').classList.remove('hidden');renderRecords()}function escapeHtml(s){return String(s??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));}
+init();
+</script>
+</body>
+</html>
